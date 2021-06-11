@@ -4,10 +4,10 @@
 
 struct Widget : public juce::Component
 {
-    Widget(int i) : num(i) {}
+    Widget(int i) : num(i) {DBG ("widget ctor");}
     void paint(juce::Graphics& g) override
     {
-        g.fillAll(juce::Colours::red);
+        g.fillAll(juce::Colours::lightgreen);
         g.setColour(juce::Colours::black);
         g.drawRect(getLocalBounds().reduced(2));
         g.drawFittedText(juce::String(num), getLocalBounds(), juce::Justification::centred, 1);
@@ -23,7 +23,10 @@ struct OwnedArrayComponent : juce::Component
         {
             auto* widget = widgets.add(new Widget(i));
             addAndMakeVisible(widget);
+            DBG ("widged loop");
         }
+        
+        DBG ("array ctor");
     }
     void resized() override
     {
@@ -41,21 +44,21 @@ struct OwnedArrayComponent : juce::Component
 };
 struct MyComp : juce::Component
 {
-    //void resized() override {}
+    void resized() override {}
     void paint(juce::Graphics& g) override { g.fillAll(juce::Colours::green); }
 
     void mouseEnter(const juce::MouseEvent& e) override
     {
-        DBG("mouseEnter");
+//         DBG("mouseEnter");
     }
     void mouseExit(const juce::MouseEvent& e) override
     {
-        DBG("mouseExit");
+//         DBG("mouseExit");
     }
     
     void mouseMove(const juce::MouseEvent& e) override
     {
-        DBG("mouseMove " << counter);
+//         DBG("mouseMove " << counter);
         ++counter;
     }
 private:
@@ -79,16 +82,16 @@ public:
 
     void mouseEnter(const juce::MouseEvent& e) override
     {
-        DBG("MainComponent mouseEnter");
+//         DBG("MainComponent mouseEnter");
     }
     void mouseExit(const juce::MouseEvent& e) override
     {
-        DBG("MainComponent mouseExit");
+//         DBG("MainComponent mouseExit");
     }
 
     void mouseMove(const juce::MouseEvent& e) override
     {
-        DBG("MainComponent mouseMove " << counter);
+//         DBG("MainComponent mouseMove " << counter);
         ++counter;
     }
 

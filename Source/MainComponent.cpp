@@ -22,7 +22,7 @@ void MainComponent::paint (juce::Graphics& g)
 
     g.setFont (juce::Font (32.0f));
     g.setColour (juce::Colours::white);
-    g.drawText ("Hello World!", getLocalBounds(), juce::Justification::centred, true);
+     g.drawText ("Hello World!", getLocalBounds(), juce::Justification::top, true);
 }
 
 void MainComponent::resized()
@@ -32,5 +32,8 @@ void MainComponent::resized()
     // update their positions.
 
     comp.setBounds(30, 30, 100, 100);
-    ownedArrayComp.setBounds(comp.getX(), comp.getBottom() + 5, getWidth() - comp.getX(), comp.getHeight() - comp.getBottom());
+    ownedArrayComp.setBounds(comp.getX(),
+                             comp.getBottom() + 5, 
+                             getWidth() - 30, 
+                             getHeight() - 30);
 }
