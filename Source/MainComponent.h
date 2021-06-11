@@ -2,16 +2,16 @@
 
 #include <JuceHeader.h>
 
-struct MyComp : Component
+struct MyComp : juce::Component
 {
     void resized() override {}
-    void paint(Graphics& g) override { g.fillAlll(Colours::green); }
+    void paint(juce::Graphics& g) override { g.fillAll(juce::Colours::green); }
 
-    void mouseEnter(const MouseEvent& e) override
+    void mouseEnter(const juce::MouseEvent& e) override
     {
         DBG("mouseEnter");
     }
-    void mouseExit(const MouseEvent& e) override
+    void mouseExit(const juce::MouseEvent& e) override
     {
         DBG("mouseExit");
     }
@@ -31,6 +31,15 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
+
+    void mouseEnter(const juce::MouseEvent& e) override
+    {
+        DBG("MainComponent mouseEnter");
+    }
+    void mouseExit(const juce::MouseEvent& e) override
+    {
+        DBG("MainComponent mouseExit");
+    }
 
 private:
     //==============================================================================
