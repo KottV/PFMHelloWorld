@@ -2,9 +2,46 @@
 
 #include <JuceHeader.h>
 
+struct Widget : public juce::Component
+{
+    Widget(int i) : num(i) {}
+    void paint(juce::Graphics& g) override
+    {
+        g.fillAll(juce::Colours::red);
+        g.setColour(juce::Colours::black);
+        g.drawRect(getLocalBounds().reduced(2));
+        g.drawFittedText(juce::String(num), getLocalBounds(), juce::Justification::centred, 1);
+    }
+
+    int num = 0;
+};
+struct OwnedArrayComponent : juce::Component
+{
+    OwnedArrayComponent()
+    {
+        for (int i; i < 10; ++i)
+        {
+            auto* widget = widgets.add(new Widget(i));
+            addAndMakeVisible(widget);
+        }
+    }
+    void resized() override
+    {
+        auto width = getWidth() / static_cast<float>(widgets.size());
+        int x = 0;
+        auto h = getHeight();
+
+        for (auto* widget : widgets)
+        {
+            widget->setBounds(x, 0, width, h);
+            x += width;
+        }
+    }
+    juce::OwnedArray<Widget> widgets;
+};
 struct MyComp : juce::Component
 {
-    void resized() override {}
+    //void resized() override {}
     void paint(juce::Graphics& g) override { g.fillAll(juce::Colours::green); }
 
     void mouseEnter(const juce::MouseEvent& e) override
@@ -15,6 +52,14 @@ struct MyComp : juce::Component
     {
         DBG("mouseExit");
     }
+    
+    void mouseMove(const juce::MouseEvent& e) override
+    {
+        DBG("mouseMove " << counter);
+        ++counter;
+    }
+private:
+        int counter = 0;
 };
 //==============================================================================
 /*
@@ -41,11 +86,18 @@ public:
         DBG("MainComponent mouseExit");
     }
 
+    void mouseMove(const juce::MouseEvent& e) override
+    {
+        DBG("MainComponent mouseMove " << counter);
+        ++counter;
+    }
+
 private:
     //==============================================================================
     // Your private member variables go here...
-
+    int counter = 0;
     MyComp comp;
+    OwnedArrayComponent ownedArrayComp;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
