@@ -15,33 +15,17 @@ struct Widget : public juce::Component
 
     int num = 0;
 };
-struct OwnedArrayComponent : juce::Component
-{
-    OwnedArrayComponent()
-    {
-        for (int i; i < 10; ++i)
-        {
-            auto* widget = widgets.add(new Widget(i));
-            addAndMakeVisible(widget);
-            DBG ("widged loop");
-        }
-        
-        DBG ("array ctor");
-    }
-    void resized() override
-    {
-        auto width = getWidth() / static_cast<float>(widgets.size());
-        int x = 0;
-        auto h = getHeight();
 
-        for (auto* widget : widgets)
-        {
-            widget->setBounds(x, 0, width, h);
-            x += width;
-        }
-    }
-    juce::OwnedArray<Widget> widgets;
+struct OwnedArrayComponent : juce::Component, juce::Button::Listener
+{
+    OwnedArrayComponent();
+    ~OwnedArrayComponent();
+    void resized() override;
+    void buttonClicked(juce::Button* buttonThatWasClicked) override; 
+private:
+    juce::OwnedArray<juce::TextButton> buttons;
 };
+
 struct MyComp : juce::Component
 {
     void resized() override {}
