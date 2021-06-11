@@ -5,7 +5,7 @@
 struct MyComp : Component
 {
     void resized() override {}
-    void paint(Grapgics& g) override { g.fillAlll(Colours::green); }
+    void paint(Graphics& g) override { g.fillAlll(Colours::green); }
 
     void mouseEnter(const MouseEvent& e) override
     {
