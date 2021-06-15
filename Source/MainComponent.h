@@ -64,25 +64,29 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    void mouseEnter(const juce::MouseEvent& e) override
-    {
-//         DBG("MainComponent mouseEnter");
-    }
-    void mouseExit(const juce::MouseEvent& e) override
-    {
-//         DBG("MainComponent mouseExit");
-    }
-
-    void mouseMove(const juce::MouseEvent& e) override
-    {
+//    void mouseEnter(const juce::MouseEvent& e) override
+//    {
+////         DBG("MainComponent mouseEnter");
+//    }
+//    void mouseExit(const juce::MouseEvent& e) override
+//    {
+////         DBG("MainComponent mouseExit");
+//    }
+//
+//    void mouseMove(const juce::MouseEvent& e) override
+//    {
 //         DBG("MainComponent mouseMove " << counter);
-        ++counter;
+//        ++counter;
+//    }
+    void mouseDown(const juce::MouseEvent& e) override
+    {
+         DBG("clicked ");
     }
 
 private:
     //==============================================================================
     // Your private member variables go here...
-    int counter = 0;
+//    int counter = 0;
     MyComp comp;
     OwnedArrayComponent ownedArrayComp;
 

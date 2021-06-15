@@ -56,7 +56,8 @@ MainComponent::MainComponent()
     addAndMakeVisible(ownedArrayComp);
     addAndMakeVisible(comp);
     setSize (600, 400);
-    comp.addMouseListener(this, false);
+    //comp.addMouseListener(this, false);
+    ownedArrayComp.addMouseListener(this, true);
 }
 
 MainComponent::~MainComponent()
