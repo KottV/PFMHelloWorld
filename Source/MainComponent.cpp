@@ -1,6 +1,27 @@
 #include "MainComponent.h"
 
+DualButton::DualButton()
+{
+    addAndMakeVisible(button1);
+    addAndMakeVisible(button2);
 
+    button1.onClick = [this]()
+    {
+        DBG("Button1's size: " << this->button1.getBounds().toString());
+    };
+
+    button2.onClick = [this]()
+    {
+        DBG("Button2's size: " << this->button2.getBounds().toString());
+    };
+}
+
+void DualButton::resized()
+{
+    auto bounds = getLocalBounds();
+    button1.setBounds(bounds.removeFromLeft(50));
+    button2.setBounds(bounds);
+}
 
 OwnedArrayComponent::OwnedArrayComponent()
 {
@@ -33,7 +54,7 @@ void OwnedArrayComponent::resized()
     }
 }
 
-void::OwnedArrayComponent::buttonClicked(juce::Button* buttonThatWasClicked)
+void::OwnedArrayComponent:: buttonClicked(juce::Button* buttonThatWasClicked)
 {
     if (buttonThatWasClicked == buttons.getFirst())
     {
@@ -55,6 +76,7 @@ MainComponent::MainComponent()
 {
     addAndMakeVisible(ownedArrayComp);
     addAndMakeVisible(comp);
+    addAndMakeVisible(dualButton);
     setSize (600, 400);
     //comp.addMouseListener(this, false);
     ownedArrayComp.addMouseListener(this, true);
@@ -71,9 +93,9 @@ void MainComponent::paint (juce::Graphics& g)
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 
-    g.setFont (juce::Font (32.0f));
-    g.setColour (juce::Colours::white);
-     g.drawText ("Hello World!", getLocalBounds(), juce::Justification::top, true);
+    //g.setFont (juce::Font (32.0f));
+    //g.setColour (juce::Colours::white);
+    //g.drawText ("Hello World!", getLocalBounds(), juce::Justification::top, true);
 }
 
 void MainComponent::resized()
@@ -87,4 +109,5 @@ void MainComponent::resized()
                              comp.getBottom() + 5, 
                              getWidth() - 60, 
                              getHeight() - comp.getHeight() - 60);
+    dualButton.setBounds(comp.getBounds().withX(comp.getRight() + 5));
 }
