@@ -8,7 +8,7 @@ struct DualButton : juce::Component
     DualButton(RepeatingThing&);
     void resized() override;
 private:
-    RepeatingThing timerThing;
+    RepeatingThing& timerThing;
     juce::TextButton button1{ "button1" }, button2{ "button2" };
 };
 
