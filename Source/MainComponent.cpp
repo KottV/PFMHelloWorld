@@ -1,6 +1,6 @@
 #include "MainComponent.h"
 
-DualButton::DualButton()
+DualButton::DualButton(RepeatingThing& rt) : timerThing(rt)
 {
     addAndMakeVisible(button1);
     addAndMakeVisible(button2);
@@ -8,11 +8,13 @@ DualButton::DualButton()
     button1.onClick = [this]()
     {
         DBG("Button1's size: " << this->button1.getBounds().toString());
+        timerThing.startTimerHz(2);
     };
 
     button2.onClick = [this]()
     {
         DBG("Button2's size: " << this->button2.getBounds().toString());
+        timerThing.startTimerHz(4);
     };
 }
 
