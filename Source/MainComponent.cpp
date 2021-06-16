@@ -74,7 +74,7 @@ void::OwnedArrayComponent:: buttonClicked(juce::Button* buttonThatWasClicked)
     //}
     if (buttonThatWasClicked)
     {
-        auto i = buttons.indexOf(buttonThatWasClicked);
+        auto i = buttons.indexOf(dynamic_cast<juce::TextButton*>(buttonThatWasClicked));
         std::cout << i << std::endl;
     }
 }
