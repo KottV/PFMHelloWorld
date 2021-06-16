@@ -58,19 +58,24 @@ void OwnedArrayComponent::resized()
 
 void::OwnedArrayComponent:: buttonClicked(juce::Button* buttonThatWasClicked)
 {
-    if (buttonThatWasClicked == buttons.getFirst())
+    //if (buttonThatWasClicked == buttons.getFirst())
+    //{
+    //    DBG("First Button");
+    //}
+    //
+    //else if (buttonThatWasClicked == buttons.getLast())
+    //{
+    //    DBG("Last Button");
+    //}
+    //
+    //else
+    //{
+    //    DBG("Other Button");
+    //}
+    if (buttonThatWasClicked)
     {
-        DBG("First Button");
-    }
-    
-    else if (buttonThatWasClicked == buttons.getLast())
-    {
-        DBG("Last Button");
-    }
-    
-    else
-    {
-        DBG("Other Button");
+        auto i = buttons.indexOf(buttonThatWasClicked);
+        std::cout << i << std::endl;
     }
 }
 //==============================================================================

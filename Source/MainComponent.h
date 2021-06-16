@@ -52,7 +52,7 @@ struct OwnedArrayComponent : juce::Component, juce::Button::Listener
     OwnedArrayComponent();
     ~OwnedArrayComponent();
     void resized() override;
-    void buttonClicked(juce::Button* buttonThatWasClicked) override; 
+    void buttonClicked(juce::Button* buttonThatWasClicked) override;
 private:
     juce::OwnedArray<juce::TextButton> buttons;
 };
