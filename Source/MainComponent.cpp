@@ -1,10 +1,11 @@
 #include "MainComponent.h"
 
-DualButton::DualButton(RepeatingThing& rt) : timerThing(rt)
+DualButton::DualButton()
 {
     addAndMakeVisible(button1);
     addAndMakeVisible(button2);
 
+    /*
     button1.onClick = [this]()
     {
         DBG("Button1's size: " << this->button1.getBounds().toString());
@@ -16,6 +17,7 @@ DualButton::DualButton(RepeatingThing& rt) : timerThing(rt)
         DBG("Button2's size: " << this->button2.getBounds().toString());
         timerThing.startTimerHz(4);
     };
+    */
 }
 
 void DualButton::resized()
@@ -23,6 +25,16 @@ void DualButton::resized()
     auto bounds = getLocalBounds();
     button1.setBounds(bounds.removeFromLeft(50));
     button2.setBounds(bounds);
+}
+
+void DualButton::setButton1Handler(std::function<void()> f)
+{
+    button1.onClick = f;
+}
+
+void DualButton::setButton2Handler(std::function<void()> f)
+{
+    button2.onClick = f;
 }
 
 OwnedArrayComponent::OwnedArrayComponent()
@@ -84,7 +96,12 @@ MainComponent::MainComponent()
     addAndMakeVisible(ownedArrayComp);
     addAndMakeVisible(comp);
     addAndMakeVisible(dualButton);
+
+    dualButton.setButton1Handler([this]() { repeatingThing.startTimerHz(2); });
+    dualButton.setButton2Handler([this]() { repeatingThing.startTimerHz(4); });
+
     addAndMakeVisible(repeatingThing);
+    addAndMakeVisible(hiResGui);
     setSize (600, 400);
     //comp.addMouseListener(this, false);
     ownedArrayComp.addMouseListener(this, true);
@@ -119,4 +136,5 @@ void MainComponent::resized()
                              getHeight() - comp.getHeight() - 60);
     dualButton.setBounds(comp.getBounds().withX(comp.getRight() + 5));
     repeatingThing.setBounds(dualButton.getBounds().withX(dualButton.getRight() + 5));
+    hiResGui.setBounds(repeatingThing.getBounds().withX(repeatingThing.getRight() + 5));
 }

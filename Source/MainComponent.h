@@ -2,14 +2,56 @@
 
 #include <JuceHeader.h>
 
-struct RepeatingThing;
+//struct RepeatingThing;
 struct DualButton : juce::Component
 {
-    DualButton(RepeatingThing&);
+    DualButton();
     void resized() override;
+    void setButton1Handler(std::function<void()> f);
+    void setButton2Handler(std::function<void()> f);
 private:
-    RepeatingThing& timerThing;
+    //RepeatingThing& timerThing;
     juce::TextButton button1{ "button1" }, button2{ "button2" };
+};
+
+struct MyAsyncHighResGui : juce::Component, juce::AsyncUpdater, juce::HighResolutionTimer
+{
+    void handleAsyncUpdate() override
+    {
+        paintColour = (paintColour + 1) % maxColours;
+        repaint();
+    }
+    void hiResTimerCallback() override { triggerAsyncUpdate(); }
+    void paint(juce::Graphics& g) override
+    {
+        switch (paintColour)
+        {
+        case 0:
+            g.setColour(juce::Colours::red);
+            break;
+        case 1:
+            g.setColour(juce::Colours::green);
+            break;
+        case 2:
+            g.setColour(juce::Colours::blue);
+            break;
+        }
+        g.fillAll();
+    }
+
+    MyAsyncHighResGui()
+    {
+        this->startTimer(1000 / 5);
+
+    }
+    ~MyAsyncHighResGui()
+    {
+        stopTimer();
+        cancelPendingUpdate();
+    }
+private:
+    int paintColour = 0;
+    const int maxColours{ 3 };
 };
 
 struct Widget : public juce::Component
@@ -121,7 +163,8 @@ private:
     MyComp comp;
     OwnedArrayComponent ownedArrayComp;
     RepeatingThing repeatingThing;
-    DualButton dualButton{ repeatingThing };
+    DualButton dualButton; // { repeatingThing };
+    MyAsyncHighResGui hiResGui;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
