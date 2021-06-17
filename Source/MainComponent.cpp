@@ -1,140 +1,181 @@
 #include "MainComponent.h"
 
-DualButton::DualButton()
+ImageProcessingThread::ImageProcessingThread(int w_, int h_) : Thread("ImageProcessingThread"), w(w_), h(h_)
 {
-    addAndMakeVisible(button1);
-    addAndMakeVisible(button2);
+	startThread();
+}
+ImageProcessingThread::~ImageProcessingThread()
+{
+	stopThread(500);
+}
+void ImageProcessingThread::run()
+{
+	while (true)
+	{
+		if (threadShouldExit())
+			break;
+		auto canvas = juce::Image(juce::Image::PixelFormat::RGB, w, h, true);
+		if (threadShouldExit())
+			break;
+		bool shouldBail = false;
+		for (int x; x < w; ++x)
+		{
+			if (threadShouldExit())
+			{
+				shouldBail = true;
+				break;
+			}
+			for (int y; y < h; ++y)
+			{
+				canvas.setPixelAt(x, y, juce::Colour(r.nextFloat(), r.nextFloat(), r.nextFload(), 1.f));
+			}
 
-    /*
-    button1.onClick = [this]()
-    {
-        DBG("Button1's size: " << this->button1.getBounds().toString());
-        timerThing.startTimerHz(2);
-    };
-
-    button2.onClick = [this]()
-    {
-        DBG("Button2's size: " << this->button2.getBounds().toString());
-        timerThing.startTimerHz(4);
-    };
-    */
+		}
+		if (threadShouldExit()|| shouldBail)
+			break;
+		if (updateRenderer)
+			updateRenderer(std::move(canvas));
+	}
 }
 
-void DualButton::resized()
-{
-    auto bounds = getLocalBounds();
-    button1.setBounds(bounds.removeFromLeft(50));
-    button2.setBounds(bounds);
-}
+	void ImageProcessingThread::setUpdateRendererFunc(std::function<void(juce::Image&&)> f) { updateRenderer = f; }
 
-void DualButton::setButton1Handler(std::function<void()> f)
-{
-    button1.onClick = f;
-}
 
-void DualButton::setButton2Handler(std::function<void()> f)
-{
-    button2.onClick = f;
-}
+	DualButton::DualButton()
+	{
+		addAndMakeVisible(button1);
+		addAndMakeVisible(button2);
 
-OwnedArrayComponent::OwnedArrayComponent()
-{
-    for (int i; i < 10; ++i)
-    {
-        auto* widget = buttons.add(new juce::TextButton(juce::String(i)));
-        addAndMakeVisible(widget);
-        widget->addListener(this);
-    }
-}
+		/*
+		button1.onClick = [this]()
+		{
+			DBG("Button1's size: " << this->button1.getBounds().toString());
+			timerThing.startTimerHz(2);
+		};
 
-OwnedArrayComponent::~OwnedArrayComponent()
-{
-    for (auto* widget : buttons)
-    {
-        widget->removeListener(this);
-    }
-}    
+		button2.onClick = [this]()
+		{
+			DBG("Button2's size: " << this->button2.getBounds().toString());
+			timerThing.startTimerHz(4);
+		};
+		*/
+	}
 
-void OwnedArrayComponent::resized()
-{
-    auto width = getWidth() / static_cast<float>(buttons.size());
-    int x = 0;
-    auto h = getHeight();
-    
-    for (auto* widget : buttons)
-    {
-        widget->setBounds(x, 0, width, h);
-        x += width;
-    }
-}
+	void DualButton::resized()
+	{
+		auto bounds = getLocalBounds();
+		button1.setBounds(bounds.removeFromLeft(50));
+		button2.setBounds(bounds);
+	}
 
-void::OwnedArrayComponent:: buttonClicked(juce::Button* buttonThatWasClicked)
-{
-    //if (buttonThatWasClicked == buttons.getFirst())
-    //{
-    //    DBG("First Button");
-    //}
-    //
-    //else if (buttonThatWasClicked == buttons.getLast())
-    //{
-    //    DBG("Last Button");
-    //}
-    //
-    //else
-    //{
-    //    DBG("Other Button");
-    //}
-    if (buttonThatWasClicked)
-    {
-        auto i = buttons.indexOf(dynamic_cast<juce::TextButton*>(buttonThatWasClicked));
-        std::cout << i << std::endl;
-    }
-}
-//==============================================================================
-MainComponent::MainComponent()
-{
-    addAndMakeVisible(ownedArrayComp);
-    addAndMakeVisible(comp);
-    addAndMakeVisible(dualButton);
+	void DualButton::setButton1Handler(std::function<void()> f)
+	{
+		button1.onClick = f;
+	}
 
-    dualButton.setButton1Handler([this]() { repeatingThing.startTimerHz(2); });
-    dualButton.setButton2Handler([this]() { repeatingThing.startTimerHz(4); });
+	void DualButton::setButton2Handler(std::function<void()> f)
+	{
+		button2.onClick = f;
+	}
 
-    addAndMakeVisible(repeatingThing);
-    addAndMakeVisible(hiResGui);
-    setSize (600, 400);
-    //comp.addMouseListener(this, false);
-    ownedArrayComp.addMouseListener(this, true);
-}
+	OwnedArrayComponent::OwnedArrayComponent()
+	{
+		for (int i; i < 10; ++i)
+		{
+			auto* widget = buttons.add(new juce::TextButton(juce::String(i)));
+			addAndMakeVisible(widget);
+			widget->addListener(this);
+		}
+	}
 
-MainComponent::~MainComponent()
-{
-    comp.removeMouseListener(this);
-}
+	OwnedArrayComponent::~OwnedArrayComponent()
+	{
+		for (auto* widget : buttons)
+		{
+			widget->removeListener(this);
+		}
+	}
 
-//==============================================================================
-void MainComponent::paint (juce::Graphics& g)
-{
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+	void OwnedArrayComponent::resized()
+	{
+		auto width = getWidth() / static_cast<float>(buttons.size());
+		int x = 0;
+		auto h = getHeight();
 
-    //g.setFont (juce::Font (32.0f));
-    //g.setColour (juce::Colours::white);
-    //g.drawText ("Hello World!", getLocalBounds(), juce::Justification::top, true);
-}
+		for (auto* widget : buttons)
+		{
+			widget->setBounds(x, 0, width, h);
+			x += width;
+		}
+	}
 
-void MainComponent::resized()
-{
-    // This is called when the MainComponent is resized.
-    // If you add any child components, this is where you should
-    // update their positions.
+	void::OwnedArrayComponent::buttonClicked(juce::Button * buttonThatWasClicked)
+	{
+		//if (buttonThatWasClicked == buttons.getFirst())
+		//{
+		//    DBG("First Button");
+		//}
+		//
+		//else if (buttonThatWasClicked == buttons.getLast())
+		//{
+		//    DBG("Last Button");
+		//}
+		//
+		//else
+		//{
+		//    DBG("Other Button");
+		//}
+		if (buttonThatWasClicked)
+		{
+			auto i = buttons.indexOf(dynamic_cast<juce::TextButton*>(buttonThatWasClicked));
+			std::cout << i << std::endl;
+		}
+	}
+	//==============================================================================
+	MainComponent::MainComponent()
+	{
+		addAndMakeVisible(ownedArrayComp);
+		addAndMakeVisible(comp);
+		addAndMakeVisible(dualButton);
 
-    comp.setBounds(30, 30, 100, 100);
-    ownedArrayComp.setBounds(comp.getX(),
-                             comp.getBottom() + 5, 
-                             getWidth() - 60, 
-                             getHeight() - comp.getHeight() - 60);
-    dualButton.setBounds(comp.getBounds().withX(comp.getRight() + 5));
-    repeatingThing.setBounds(dualButton.getBounds().withX(dualButton.getRight() + 5));
-    hiResGui.setBounds(repeatingThing.getBounds().withX(repeatingThing.getRight() + 5));
-}
+		dualButton.setButton1Handler([this]() { repeatingThing.startTimerHz(2); });
+		dualButton.setButton2Handler([this]() { repeatingThing.startTimerHz(4); });
+
+		addAndMakeVisible(repeatingThing);
+		addAndMakeVisible(hiResGui);
+		setSize(600, 400);
+		//comp.addMouseListener(this, false);
+		ownedArrayComp.addMouseListener(this, true);
+	}
+
+	MainComponent::~MainComponent()
+	{
+		comp.removeMouseListener(this);
+	}
+
+	//==============================================================================
+	void MainComponent::paint(juce::Graphics & g)
+	{
+		// (Our component is opaque, so we must completely fill the background with a solid colour)
+		g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+
+		//g.setFont (juce::Font (32.0f));
+		//g.setColour (juce::Colours::white);
+		//g.drawText ("Hello World!", getLocalBounds(), juce::Justification::top, true);
+	}
+
+	void MainComponent::resized()
+	{
+		// This is called when the MainComponent is resized.
+		// If you add any child components, this is where you should
+		// update their positions.
+
+		comp.setBounds(30, 30, 100, 100);
+		ownedArrayComp.setBounds(comp.getX(),
+			comp.getBottom() + 5,
+			getWidth() - 60,
+			getHeight() - comp.getHeight() - 60);
+		dualButton.setBounds(comp.getBounds().withX(comp.getRight() + 5));
+		repeatingThing.setBounds(dualButton.getBounds().withX(dualButton.getRight() + 5));
+		hiResGui.setBounds(repeatingThing.getBounds().withX(repeatingThing.getRight() + 5));
+	}

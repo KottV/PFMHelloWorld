@@ -2,6 +2,41 @@
 
 #include <JuceHeader.h>
 
+struct MyThread : juce::Thread
+{
+    MyThread() : Thread("MyThread")
+    {
+        startThread();
+    }
+    ~MyThread()
+    {
+        stopThread(100);
+    }
+    void run() override
+    {
+        while (true)
+        {
+            if (threadShouldExit())
+                break;
+
+        }
+    }
+};
+//======================================================================
+struct ImageProcessingThread : juce::Thread
+{
+    ImageProcessingThread(int w_, int h_);
+    ~ImageProcessingThread();
+    void run() override;
+    void setUpdateRendererFunc(std::function<void(juce::Image&&)> f);
+private:
+    int w{ 0 }, h{ 0 };
+    std::function<void(juce::Image&&)> updateRenderer;
+    juce::Random r;
+};
+
+//======================================================================
+// 
 //struct RepeatingThing;
 struct DualButton : juce::Component
 {
