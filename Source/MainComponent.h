@@ -1,6 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <array>
 
 struct MyThread : juce::Thread
 {
@@ -36,6 +37,30 @@ private:
 };
 
 //======================================================================
+
+struct LambdaTimer : juce::Timer
+{
+    LambdaTimer(int ms, std::function<void()> f);
+    ~LambdaTimer();
+    void timerCallback() override;
+private:
+    std::function<void()> lambda;
+};
+//======================================================================
+struct Renderer : juce::Component, juce::AsyncUpdater
+{
+    Renderer();
+    ~Renderer();
+    void paint(juce::Graphics& g) override;
+    void handleAsyncUpdate() override;
+private:
+    std::unique_ptr<ImageProcessingThread> processingThread;
+    std::unique_ptr<LambdaTimer> lambdaTimer;
+    bool firstImage = true;
+    std::array<juce::Image,2> imageToRender;
+};
+
+
 // 
 //struct RepeatingThing;
 struct DualButton : juce::Component
@@ -200,6 +225,7 @@ private:
     RepeatingThing repeatingThing;
     DualButton dualButton; // { repeatingThing };
     MyAsyncHighResGui hiResGui;
+    Renderer renderer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

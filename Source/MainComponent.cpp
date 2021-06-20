@@ -27,7 +27,7 @@ void ImageProcessingThread::run()
             }
             for (int y; y < h; ++y)
             {
-                canvas.setPixelAt(x, y, juce::Colour(r.nextFloat(), r.nextFloat(), r.nextFload(), 1.f));
+                canvas.setPixelAt(x, y, juce::Colour(r.nextFloat(), r.nextFloat(), r.nextFloat(), 1.f));
             }
             
         }
@@ -35,11 +35,64 @@ void ImageProcessingThread::run()
             break;
         if (updateRenderer)
             updateRenderer(std::move(canvas));
+        
+        wait (-1);
     }
 }
 
 void ImageProcessingThread::setUpdateRendererFunc(std::function<void(juce::Image&&)> f) { updateRenderer = f; }
 
+LambdaTimer::LambdaTimer(int ms, std::function<void()> f) : lambda (std::move(f))
+{
+    startTimer(ms);
+}
+LambdaTimer::~LambdaTimer()
+{
+    stopTimer();
+}
+
+void LambdaTimer::timerCallback()
+{
+    stopTimer();
+    if(lambda) lambda();
+}
+
+Renderer::Renderer()
+{
+    lambdaTimer = std::make_unique<LambdaTimer>(10, [this]()
+    {
+         processingThread = std::make_unique<ImageProcessingThread>(getWidth(), getHeight());
+         processingThread->setUpdateRendererFunc([this](juce::Image&& image)
+         {
+             int renderIndex = firstImage ? 0 : 1;
+             firstImage = !firstImage;
+             imageToRender[renderIndex] = std::move(image);
+             triggerAsyncUpdate();
+             
+             lambdaTimer = std::make_unique<LambdaTimer>(1000, [this]()
+             {
+                 processingThread->notify();
+             });
+         });
+    });
+    
+}
+
+Renderer::~Renderer()
+{
+    processingThread.reset();
+    lambdaTimer.reset();
+}
+
+void Renderer::paint(juce::Graphics& g)
+{
+    g.drawImage(firstImage ? imageToRender[0] : imageToRender[1], getLocalBounds().toFloat());
+}
+
+void Renderer::handleAsyncUpdate()
+{
+    repaint();
+}
 
 DualButton::DualButton()
 {
@@ -137,6 +190,7 @@ MainComponent::MainComponent()
     addAndMakeVisible(ownedArrayComp);
     addAndMakeVisible(comp);
     addAndMakeVisible(dualButton);
+    addAndMakeVisible(renderer);
     
     dualButton.setButton1Handler([this]() { repeatingThing.startTimerHz(2); });
     dualButton.setButton2Handler([this]() { repeatingThing.startTimerHz(4); });
@@ -178,4 +232,5 @@ void MainComponent::resized()
     dualButton.setBounds(comp.getBounds().withX(comp.getRight() + 5));
     repeatingThing.setBounds(dualButton.getBounds().withX(dualButton.getRight() + 5));
     hiResGui.setBounds(repeatingThing.getBounds().withX(repeatingThing.getRight() + 5));
+    renderer.setBounds(hiResGui.getBounds().withX(hiResGui.getRight() + 5));
 }
