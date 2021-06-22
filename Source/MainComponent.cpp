@@ -18,14 +18,14 @@ void ImageProcessingThread::run()
         if (threadShouldExit())
             break;
         bool shouldBail = false;
-        for (int x; x < w; ++x)
+        for (int x = 0; x < w; ++x)
         {
             if (threadShouldExit())
             {
                 shouldBail = true;
                 break;
             }
-            for (int y; y < h; ++y)
+            for (int y = 0; y < h; ++y)
             {
                 canvas.setPixelAt(x, y, juce::Colour(r.nextFloat(), r.nextFloat(), r.nextFloat(), 1.f));
             }
